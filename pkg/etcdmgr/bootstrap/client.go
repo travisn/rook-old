@@ -35,11 +35,7 @@ func GetEtcdClients(configDir, token, ipAddr, nodeID string) ([]string, error) {
 	}
 
 	log.Println("quorum is not complete, creating a new embedded etcd member...")
-	conf, err := generateConfig(configDir, ipAddr, nodeID)
-	if err != nil {
-		return []string{}, err
-	}
-	log.Println("conf:", conf)
+	conf := newConfig(configDir, ipAddr, nodeID)
 
 	factory := EmbeddedEtcdFactory{}
 	ee, err := factory.NewEmbeddedEtcd(token, conf, true)

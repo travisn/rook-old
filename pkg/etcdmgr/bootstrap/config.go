@@ -45,8 +45,8 @@ func CopyConfig(conf *Config) Config {
 	return newConf
 }
 
-// generateConfig automatically generates a config for embedded etcd
-func generateConfig(configDir, ipAddr, nodeID string) (*Config, error) {
+// newConfig automatically generates a config for embedded etcd
+func newConfig(configDir, ipAddr, nodeID string) *Config {
 	conf := &Config{}
 	conf.InstanceName = nodeID
 	conf.ListenPeerURLs = append(conf.ListenPeerURLs,
@@ -60,17 +60,17 @@ func generateConfig(configDir, ipAddr, nodeID string) (*Config, error) {
 	conf.DataDir = path.Join(configDir, "etcd-data")
 	conf.URLsMap = types.URLsMap{}
 
-	return conf, nil
+	log.Printf("etcd config: %+v", conf)
+
+	return conf
 }
 
 // GenerateConfigFromExistingCluster automatically generates a config for joining an existing cluster
 func GenerateConfigFromExistingCluster(Context EtcdMgrContext, configDir, ipAddr, nodeID string) (*Config, error) {
-	conf, err := generateConfig(configDir, ipAddr, nodeID)
-	if err != nil {
-		return nil, err
-	}
+	conf := newConfig(configDir, ipAddr, nodeID)
 
 	// get current urlmap of the etcd cluster
+	var err error
 	_, conf.URLsMap, err = Context.Members()
 	if err != nil {
 		return nil, err
